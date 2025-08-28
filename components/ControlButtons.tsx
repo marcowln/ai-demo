@@ -7,13 +7,14 @@ interface ControlButtonsProps {
   onStart: () => void;
   onPause: () => void;
   onEnd: () => void;
+  hasParticipants: boolean;
 }
 
-const ControlButtons: React.FC<ControlButtonsProps> = ({ isActive, timeInSeconds, onStart, onPause, onEnd }) => {
+const ControlButtons: React.FC<ControlButtonsProps> = ({ isActive, timeInSeconds, onStart, onPause, onEnd, hasParticipants }) => {
   const baseButtonClass = "w-full sm:w-auto flex-1 sm:flex-none flex items-center justify-center text-white font-bold py-3 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-800";
   
   return (
-    <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-8">
+    <div className={`flex flex-col sm:flex-row justify-center items-center gap-4 mt-8 transition-filter duration-300 ${!hasParticipants ? 'blur-sm pointer-events-none' : ''}`}>
       {!isActive ? (
         <button
           onClick={onStart}

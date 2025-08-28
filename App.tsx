@@ -251,6 +251,7 @@ const App: React.FC = () => {
               onStart={handleStart}
               onPause={handlePause}
               onEnd={handleEnd}
+              hasParticipants={participants.length > 0}
             />
           </div>
 
