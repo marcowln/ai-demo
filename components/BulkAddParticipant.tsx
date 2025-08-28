@@ -14,7 +14,7 @@ const formatSalary = (salaryInThousands: number) => {
 }
 
 const UserIcon: React.FC = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" viewBox="0 0 20 20" fill="currentColor">
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-slate-500 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
       <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
     </svg>
 );
@@ -25,15 +25,68 @@ const BanknoteIcon: React.FC = () => (
     </svg>
 );
 
+const UserGroupIcon: React.FC = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+        <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+    </svg>
+);
+
 const BulkAddParticipant: React.FC<BulkAddParticipantProps> = ({ onBulkAdd }) => {
-  const [selectedCount, setSelectedCount] = useState<number | 'manual'>(4);
-  const [manualCount, setManualCount] = useState('10');
-  const [averageSalary, setAverageSalary] = useState('80'); // 80k
-  const [isSliding, setIsSliding] = useState(false);
+  const PARTICIPANT_SLIDER_MIN = 1;
+  const PARTICIPANT_SLIDER_MAX = 9;
+  const SALARY_SLIDER_MIN = 50;
+  const SALARY_SLIDER_MAX = 300;
+
+  const [participantCount, setParticipantCount] = useState('4');
+  const [isManualCount, setIsManualCount] = useState(false);
+  const [averageSalary, setAverageSalary] = useState('80');
+  const [isManualSalary, setIsManualSalary] = useState(false);
+  const [isParticipantSliding, setIsParticipantSliding] = useState(false);
+  const [isSalarySliding, setIsSalarySliding] = useState(false);
+
+  const handleParticipantChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === '') {
+        setParticipantCount('');
+        return;
+    }
+    const numValue = parseInt(value, 10);
+    
+    if (e.target.type === 'range') {
+      if (numValue >= PARTICIPANT_SLIDER_MAX) {
+        setIsManualCount(true);
+      }
+    } else {
+      if (!isNaN(numValue) && numValue < PARTICIPANT_SLIDER_MAX) {
+        setIsManualCount(false);
+      }
+    }
+    setParticipantCount(value);
+  };
+  
+  const handleSalaryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === '') {
+        setAverageSalary('');
+        return;
+    }
+    const numValue = parseInt(value, 10);
+
+    if (e.target.type === 'range') {
+      if (numValue >= SALARY_SLIDER_MAX) {
+        setIsManualSalary(true);
+      }
+    } else {
+      if (!isNaN(numValue) && numValue < SALARY_SLIDER_MAX) {
+        setIsManualSalary(false);
+      }
+    }
+    setAverageSalary(value);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const finalCount = selectedCount === 'manual' ? parseInt(manualCount, 10) : selectedCount;
+    const finalCount = parseInt(participantCount, 10);
     const numSalary = parseInt(averageSalary, 10);
     if (!isNaN(finalCount) && finalCount > 0 && !isNaN(numSalary) && numSalary > 0) {
       onBulkAdd(finalCount, numSalary);
@@ -41,90 +94,110 @@ const BulkAddParticipant: React.FC<BulkAddParticipantProps> = ({ onBulkAdd }) =>
       alert("Please enter a valid number of participants and average salary.");
     }
   };
-  
-  const countOptions = [2, 3, 4, 5, 6, 7, 8, 9];
 
-  const buttonClass = (count: number | 'manual') => 
-    `flex flex-col items-center justify-center p-2 rounded-lg border-2 transition-all duration-200 w-20 h-20 transform hover:-translate-y-1
-     ${selectedCount === count 
-       ? 'bg-indigo-600 border-indigo-700 text-white shadow-lg' 
-       : 'bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:border-indigo-500'
-     }`;
-
+  const inputClass = "block w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500";
+  const sliderClass = "w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer dark:bg-slate-700";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-        <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200">Quick Add</h3>
-        
-        {/* Participant Count Selector */}
-        <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Number of Participants
-            </label>
-            <div className="flex flex-wrap items-center gap-3">
-                {countOptions.map(num => (
-                    <button key={num} type="button" onClick={() => setSelectedCount(num)} className={buttonClass(num)}>
-                        <UserIcon />
-                        <span className="font-bold text-xl mt-1">{num}</span>
-                    </button>
-                ))}
-                <button type="button" onClick={() => setSelectedCount('manual')} className={buttonClass('manual')}>
-                    <span className="font-bold text-xl">9+</span>
-                    <span className="text-xs font-medium">Manual</span>
-                </button>
-            </div>
-            {selectedCount === 'manual' && (
-                <div className="mt-4 max-w-xs transition-all duration-300 ease-in-out">
-                    <label htmlFor="manual-participant-count" className="sr-only">Manual Participant Count</label>
-                    <input
-                        id="manual-participant-count"
-                        type="number"
-                        value={manualCount}
-                        onChange={(e) => setManualCount(e.target.value)}
-                        className="block w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                        min="10"
-                        required
-                        autoFocus
-                    />
-                </div>
+      <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200">Quick Add</h3>
+      
+      <div>
+        <label htmlFor="participant-count" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+          Number of Participants
+        </label>
+        <div className="flex items-center gap-3">
+          <UserIcon />
+          <div className="flex-grow">
+            {isManualCount ? (
+              <input
+                id="participant-count"
+                type="number"
+                value={participantCount}
+                onChange={handleParticipantChange}
+                className={inputClass}
+                min={PARTICIPANT_SLIDER_MIN}
+                required
+                autoFocus
+              />
+            ) : (
+              <input
+                id="participant-count"
+                type="range"
+                min={PARTICIPANT_SLIDER_MIN}
+                max={PARTICIPANT_SLIDER_MAX}
+                step="1"
+                value={participantCount}
+                onChange={handleParticipantChange}
+                onMouseDown={() => setIsParticipantSliding(true)}
+                onMouseUp={() => setIsParticipantSliding(false)}
+                onTouchStart={() => setIsParticipantSliding(true)}
+                onTouchEnd={() => setIsParticipantSliding(false)}
+                className={sliderClass}
+              />
             )}
+          </div>
+          <div className="w-32 text-right">
+            <span className={`inline-block font-semibold text-slate-600 dark:text-slate-300 text-sm tabular-nums transition-all duration-150 ease-out ${isParticipantSliding && !isManualCount ? 'transform scale-125 bg-indigo-600 text-white px-3 py-1 rounded-full shadow-lg' : ''}`}>
+              {participantCount || '0'} {parseInt(participantCount, 10) === 1 ? 'participant' : 'participants'}
+            </span>
+          </div>
         </div>
+      </div>
 
-        {/* Average Salary Slider */}
-        <div>
-            <label htmlFor="average-salary" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Average Salary
-            </label>
-            <div className="flex items-center gap-3">
-                <BanknoteIcon />
-                <input
-                    id="average-salary"
-                    type="range"
-                    min="50"
-                    max="300"
-                    step="5"
-                    value={averageSalary}
-                    onChange={(e) => setAverageSalary(e.target.value)}
-                    onMouseDown={() => setIsSliding(true)}
-                    onMouseUp={() => setIsSliding(false)}
-                    onTouchStart={() => setIsSliding(true)}
-                    onTouchEnd={() => setIsSliding(false)}
-                    className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer dark:bg-slate-700"
-                />
-                <div className="w-28 text-right">
-                    <span className={`inline-block font-semibold text-slate-600 dark:text-slate-300 text-sm tabular-nums transition-all duration-150 ease-out ${isSliding ? 'transform scale-125 bg-indigo-600 text-white px-3 py-1 rounded-full shadow-lg' : ''}`}>
-                        {formatSalary(parseInt(averageSalary, 10))}
-                    </span>
-                </div>
-            </div>
+      <div>
+        <label htmlFor="average-salary" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+          Average Salary
+        </label>
+        <div className="flex items-center gap-3">
+          <BanknoteIcon />
+          <div className="flex-grow">
+            {isManualSalary ? (
+              <input
+                id="average-salary"
+                type="number"
+                value={averageSalary}
+                onChange={handleSalaryChange}
+                className={inputClass}
+                min={1}
+                step="1"
+                required
+                autoFocus
+              />
+            ) : (
+              <input
+                id="average-salary"
+                type="range"
+                min={SALARY_SLIDER_MIN}
+                max={SALARY_SLIDER_MAX}
+                step="5"
+                value={averageSalary}
+                onChange={handleSalaryChange}
+                onMouseDown={() => setIsSalarySliding(true)}
+                onMouseUp={() => setIsSalarySliding(false)}
+                onTouchStart={() => setIsSalarySliding(true)}
+                onTouchEnd={() => setIsSalarySliding(false)}
+                className={sliderClass}
+              />
+            )}
+          </div>
+          <div className="w-28 text-right">
+            <span className={`inline-block font-semibold text-slate-600 dark:text-slate-300 text-sm tabular-nums transition-all duration-150 ease-out ${isSalarySliding && !isManualSalary ? 'transform scale-125 bg-indigo-600 text-white px-3 py-1 rounded-full shadow-lg' : ''}`}>
+              {formatSalary(parseInt(averageSalary, 10) || 0)}
+            </span>
+          </div>
         </div>
+      </div>
 
-      <button
-        type="submit"
-        className="w-full sm:w-auto px-6 py-2 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-slate-800 transition-colors"
-      >
-        Add Group
-      </button>
+      <div className="flex justify-center pt-2">
+        <button
+          type="submit"
+          className="w-full sm:w-auto flex items-center justify-center px-8 py-3 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-slate-800 transition-colors"
+        >
+          <UserGroupIcon />
+          Add Group
+        </button>
+      </div>
     </form>
   );
 };
