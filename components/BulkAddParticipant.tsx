@@ -27,7 +27,7 @@ const BanknoteIcon: React.FC = () => (
 
 const BulkAddParticipant: React.FC<BulkAddParticipantProps> = ({ onBulkAdd }) => {
   const [selectedCount, setSelectedCount] = useState<number | 'manual'>(4);
-  const [manualCount, setManualCount] = useState('9');
+  const [manualCount, setManualCount] = useState('10');
   const [averageSalary, setAverageSalary] = useState('80'); // 80k
   const [isSliding, setIsSliding] = useState(false);
 
@@ -42,7 +42,7 @@ const BulkAddParticipant: React.FC<BulkAddParticipantProps> = ({ onBulkAdd }) =>
     }
   };
   
-  const countOptions = [2, 3, 4, 5, 6, 7, 8];
+  const countOptions = [2, 3, 4, 5, 6, 7, 8, 9];
 
   const buttonClass = (count: number | 'manual') => 
     `flex flex-col items-center justify-center p-2 rounded-lg border-2 transition-all duration-200 w-20 h-20 transform hover:-translate-y-1
@@ -69,7 +69,7 @@ const BulkAddParticipant: React.FC<BulkAddParticipantProps> = ({ onBulkAdd }) =>
                     </button>
                 ))}
                 <button type="button" onClick={() => setSelectedCount('manual')} className={buttonClass('manual')}>
-                    <span className="font-bold text-xl">8+</span>
+                    <span className="font-bold text-xl">9+</span>
                     <span className="text-xs font-medium">Manual</span>
                 </button>
             </div>
@@ -82,7 +82,7 @@ const BulkAddParticipant: React.FC<BulkAddParticipantProps> = ({ onBulkAdd }) =>
                         value={manualCount}
                         onChange={(e) => setManualCount(e.target.value)}
                         className="block w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                        min="9"
+                        min="10"
                         required
                         autoFocus
                     />
