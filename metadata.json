@@ -1,0 +1,5 @@
+{
+  "name": "Meeting Cost Calculator",
+  "description": "A simple application to calculate the real-time cost of a meeting based on the salaries of its participants. Add attendees, start the timer, and watch the cost accumulate.",
+  "requestFramePermissions": []
+}
