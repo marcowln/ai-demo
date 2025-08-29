@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Participant } from '../types';
+import LizardAnimation from './LizardAnimation';
 
 interface TimerDisplayProps {
   timeInSeconds: number;
@@ -94,6 +95,9 @@ const TimerDisplay: React.FC<TimerDisplayProps> = ({ timeInSeconds, totalCost, c
             )}
           </div>
         </div>
+        
+        {/* Lizard Animation */}
+        <LizardAnimation timeInSeconds={timeInSeconds} />
       </div>
       
       {!hasParticipants && (
